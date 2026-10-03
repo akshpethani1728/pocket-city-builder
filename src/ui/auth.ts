@@ -1,4 +1,4 @@
-import { authService, onAuthStateChange, getSupabase } from '../services/authService';
+import { authService, onAuthStateChange, getSupabase, getCurrentUser } from '../services/authService';
 import { buildGameUI } from './gameUI';
 
 /**
@@ -84,11 +84,19 @@ export function initAuth(): void {
     }
   });
 
-  // Check if already logged in
-  if (getSupabase()) {
-    // onAuthStateChange will handle the rest
+  // Check if already logged in — handle initial state properly
+  const supabase = getSupabase();
+  if (supabase && getCurrentUser()) {
+    // User is already logged in with Supabase — load city from Supabase
+    document.getElementById('auth-overlay')!.hidden = true;
+    document.getElementById('game-ui')!.hidden = false;
+    initGameUI();
+  } else if (supabase) {
+    // Supabase configured but no user yet — show auth overlay
+    document.getElementById('auth-overlay')!.hidden = false;
+    document.getElementById('game-ui')!.hidden = true;
   } else {
-    // Local-only mode - skip auth
+    // Local-only mode — skip auth, load from localStorage
     document.getElementById('auth-overlay')!.hidden = true;
     document.getElementById('game-ui')!.hidden = false;
     initGameUI();

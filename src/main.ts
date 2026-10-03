@@ -14,7 +14,9 @@ import { logger } from './lib/logger';
  */
 async function boot(): Promise<void> {
   const cloudEnabled = isCloudEnabled();
-  const saved = cloudEnabled ? null : loadLocal();
+  const supabase = getSupabase();
+
+  let saved = cloudEnabled && supabase ? null : loadLocal();
   const store = createStore(saved ?? createFreshGameState(cloudEnabled));
   store.update({ cloudEnabled });
 
