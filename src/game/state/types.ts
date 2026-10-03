@@ -24,6 +24,8 @@ export interface CityState {
   populationProgress: number;
   /** Simulated city age in seconds (drives new-city grace rules). */
   ageSec: number;
+  /** Highest city stage ever reached (unlocks are permanent). */
+  highestStageId: string;
   /** 0-100 snapshot; real formula arrives with satisfaction system. */
   satisfaction: number;
 }

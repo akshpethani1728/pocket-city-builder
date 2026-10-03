@@ -20,7 +20,8 @@ export function createStarterCity(): CityState {
     housingCapacity: 0,
     populationProgress: 0,
     ageSec: 0,
-    satisfaction: 0 // no services yet; first tick confirms the snapshot
+    satisfaction: 0,
+    highestStageId: 'settlement'
   };
 }
 

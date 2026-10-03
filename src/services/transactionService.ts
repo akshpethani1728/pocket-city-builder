@@ -1,11 +1,13 @@
-import { notImplemented } from '../lib/logger';
+import { economyService } from './economyService';
+import { logger } from '../lib/logger';
 
 /**
- * P2P transfers — post-MVP. Must be a Postgres RPC with row locks,
- * balance checks, and an append-only ledger row. Never a direct table write.
+ * P2P transfers — uses the secure server-side RPC.
+ * Generates an idempotency key for safety.
  */
 export const transactionService = {
-  async sendFunds(): Promise<never> {
-    return notImplemented('transactionService.sendFunds');
+  async sendFunds(toUserId: string, amount: number): Promise<{ ok: boolean; error?: string; newBalance?: number }> {
+    const idempotencyKey = crypto.randomUUID();
+    return economyService.transferFunds(toUserId, amount, idempotencyKey);
   }
 };

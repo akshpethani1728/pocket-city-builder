@@ -1,14 +1,27 @@
-import { notImplemented } from '../lib/logger';
+import { signInWithEmail, signUpWithEmail, signOut, onAuthStateChange, getCurrentUser, getSupabase } from './supabaseClient';
 
-/** Google login via Supabase Auth — dedicated later phase. */
 export const authService = {
-  async signInWithGoogle(): Promise<never> {
-    return notImplemented('authService.signInWithGoogle');
+  async signIn(email: string, password: string) {
+    return signInWithEmail(email, password);
   },
-  async signOut(): Promise<never> {
-    return notImplemented('authService.signOut');
+
+  async signUp(email: string, password: string) {
+    return signUpWithEmail(email, password);
   },
-  async getSession(): Promise<never> {
-    return notImplemented('authService.getSession');
+
+  async signOut() {
+    return signOut();
+  },
+
+  async getCurrentUser() {
+    return getCurrentUser();
+  },
+
+  onAuthStateChange(callback: (user: { id: string; email: string } | null) => void) {
+    return onAuthStateChange((_event, session) => {
+      callback(session?.user ? { id: session.user.id, email: session.user.email ?? '' } : null);
+    });
   }
 };
+
+export { onAuthStateChange, getSupabase };

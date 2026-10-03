@@ -11,10 +11,11 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.44.0"
+    "@supabase/supabase-js": "^2.44.0",
+    "pg": "^8.23.1"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
+    "typescript": "^5.9.3",
     "vite": "^6.0.0"
   },
   "engines": {
