@@ -1,0 +1,23 @@
+{
+  "name": "pocketopolis",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Pocketopolis — mobile-first 2D/2.5D idle city builder PWA (Phase 1 foundation)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.44.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vite": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
