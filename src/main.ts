@@ -1,6 +1,6 @@
 import { authService, onAuthStateChange } from './services/authService';
 import { cityService } from './services/cityService';
-import { getSupabase, isCloudEnabled } from './services/supabaseClient';
+import { getSupabase, isCloudEnabled, getCurrentUser } from './services/supabaseClient';
 import { createStore } from './game/state/store';
 import { createFreshGameState } from './game/city/newCity';
 import { loadLocal, saveLocal } from './lib/localSave';
@@ -16,7 +16,7 @@ async function boot(): Promise<void> {
   const cloudEnabled = isCloudEnabled();
   const supabase = getSupabase();
 
-  let saved = cloudEnabled && supabase ? null : loadLocal();
+  let saved = cloudEnabled && supabase && getCurrentUser() ? null : loadLocal();
   const store = createStore(saved ?? createFreshGameState(cloudEnabled));
   store.update({ cloudEnabled });
 
@@ -32,7 +32,7 @@ async function boot(): Promise<void> {
     store.subscribe((s) => saveLocal(s));
   }
 
-  // Initialize auth flow
+  // Initialize auth flow (which will load city and start tick driver)
   initAuth();
 }
 

@@ -108,19 +108,50 @@ async function initGameUI(): Promise<void> {
   const { createFreshGameState } = await import('../game/city/newCity');
   const { loadLocal, saveLocal } = await import('../lib/localSave');
   const { buildGameUI } = await import('./gameUI');
-  const { cityService } = await import('../services/cityService');
-  const { isCloudEnabled } = await import('../services/supabaseClient');
+  const { cityService, loadCity } = await import('../services/cityService');
+  const { isCloudEnabled, getCurrentUser } = await import('../services/supabaseClient');
 
   const cloudEnabled = isCloudEnabled();
-  const saved = loadLocal();
+  const supabase = getSupabase();
+  let saved: import('../game/state/types').GameState | null;
+
+  if (cloudEnabled && supabase && getCurrentUser()) {
+    // Load city from Supabase
+    const loaded = await loadCity();
+    if (loaded) {
+      saved = loaded;
+    } else {
+      // No city yet — start fresh
+      saved = createFreshGameState(cloudEnabled);
+    }
+  } else {
+    saved = loadLocal();
+  }
+
   const store = createStore(saved ?? createFreshGameState(cloudEnabled));
   store.update({ cloudEnabled: true });
 
   const gameUI = document.getElementById('game-ui')!;
-  buildGameUI(gameUI, store);
+  const renderer = buildGameUI(gameUI, store);
+
+  // Immediately set buildings from store so the map renders the city
+  const initialBuildings = store.get().buildings;
+  renderer.setBuildings(initialBuildings);
+
+  // Subscribe to store changes to keep renderer in sync
+  store.subscribe((state) => {
+    renderer.setBuildings(state.buildings);
+  });
+
+  // Start the sim tick driver (1s interval, updates population/economy)
+  // Runs in both cloud and local mode — sim reads from store state
+  const { startTickDriver } = await import('../game/sim/tick');
+  startTickDriver(store, 1000);
+
+  // Cleanup unsubscribe on component unmount (simple approach for now)
+  // Note: in a React app would use useEffect cleanup, but here we keep it simple
 
   if (cloudEnabled) {
-    const { cityService } = await import('../services/cityService');
     store.subscribe((s) => cityService.saveCity(
       s.city as any,
       s.buildings,
